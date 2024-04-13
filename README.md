@@ -30,4 +30,8 @@ This code is created by starting out with the XZ code and applying
 Hadamard operators (H) in vertical lines in every second column. 
 
 
+#Links 
+
+[qecsim](https://github.com/qecsim)
+[qsdxzzx](https://bitbucket.org/qecsim/qsdxzzx/src/master/)
 
