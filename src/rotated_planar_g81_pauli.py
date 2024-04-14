@@ -58,4 +58,73 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
         return self
 
 
+    def logical_x(self): 
+        """
+        Apply a logical X operator, i.e. <<INSERT OPERATOR STRUCTURE>>
+
+        Notes: 
+
+        * Operators are applied to the bottom row to allow optimisation of the MPS decoder. (KRAV ELLER VALBART?)
+
+        :return: self (to allow chaining)
+        :rtype: RotatedPlanarG81Pauli
+        """
+
+
+        # TODO
+        return self
+
+
+    def logical_z(self): 
+        """
+        Apply a logical Z operator, i.e. <<INSERT OPERATOR STRUCTURE>>
+
+        Notes: 
+
+        * Operators are applied to the rightmost column to allow optimisation of the MPS decoder. (KRAV ELLER VALBART?)
+
+        :return: self (to allow chaining)
+        :rtype: RotatedPlanarG81Pauli
+        """
+
+
+        # TODO
+        return self
+
+
+    # String representation of the class
+    def __repr__(self): 
+        return '{}({!r}, {!r})'.format(type(self).__name__, self.code, self.to_bsf())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
