@@ -4,7 +4,7 @@ Code repository connected to our BSc Quantum Error Correction project
 
 This is an extention of the qecsim package, with large inspiration from 
 the qsdxzzx extention package to qecsim, created with the ambition to 
-implement a decoder for the XZXZ/ZXZX code (shortend to G81), an example 
+implement a decoder for the XZXZ/ZXZX code (shortened to G81), an example 
 of which can be seen below: 
 
 
