@@ -2,7 +2,7 @@ import operator
 
 from qecsim.model import cli_description
 from qecsim.models.rotatedplanar import RotatedPlanarCode
-import RotatedPlanarXZPauli
+import RotatedPlanarG81Pauli
 
 
 @cli_description('Rotated planar G81 (distance INT odd >= 3)')
@@ -87,7 +87,7 @@ class RotatedPlanarXZCode(RotatedPlanarCode):
     @property
     def label(self):
         """See :meth:`qecsim.model.StabilizerCode.label`"""
-        return 'Rotated planar XZ {}'.format(self.n_k_d[2])
+        return 'Rotated planar G81 (XZXZ/ZXZX), d = {}'.format(self.n_k_d[2])
 
     # </ StabilizerCode interface methods >
 
@@ -104,8 +104,8 @@ class RotatedPlanarXZCode(RotatedPlanarCode):
 
         :param bsf: Binary symplectic representation of Pauli. (Optional. Defaults to identity.)
         :type bsf: numpy.array (1d)
-        :return: Rotated planar XZ Pauli
-        :rtype: RotatedPlanarXZPauli
+        :return: Rotated planar G81 (XZXZ/ZXZX) Pauli
+        :rtype: RotatedPlanarG81Pauli
         """
-        return RotatedPlanarXZPauli(self, bsf)
+        return RotatedPlanarG81Pauli(self, bsf)
 
