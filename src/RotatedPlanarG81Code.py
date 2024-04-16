@@ -82,6 +82,35 @@ class RotatedPlanarXZCode(RotatedPlanarCode):
             raise TypeError('{} invalid parameter type'.format(type(self).__name__)) from ex
         super().__init__(distance, distance)
 
+
+    @classmethod
+    def is_zxzx_plaquette(cls, index):
+        """
+        Return True if the plaquette index specifies an ZX/ZX-type plaquette, irrespective of lattice bounds.
+
+        :param index: Index in the format (x, y).
+        :type index: 2-tuple of int
+        :return: If the index specifies an X-type plaquette.
+        :rtype: bool
+        """
+        x, y = index
+        return y % 2 == 0
+
+
+    @classmethod
+    def is_xzxz_plaquette(cls, index):
+        """
+        Return True if the plaquette index specifies an XZ/XZ-type plaquette, irrespective of lattice bounds.
+
+        :param index: Index in the format (x, y).
+        :type index: 2-tuple of int
+        :return: If the index specifies an X-type plaquette.
+        :rtype: bool
+        """
+        x, y = index
+        return y % 2 == 1
+
+
     # < StabilizerCode interface methods >
 
     @property
