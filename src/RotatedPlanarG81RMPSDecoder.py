@@ -178,36 +178,6 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
         return sample_recovery
 
 
-
-
-
-
-
-
-
-            """ ***TO BE REMOVED***
-            # NOTE: plaquette index coincides with site on lower left corner
-            plaq_x, plaq_y = plaq_index
-            # if upper-left even diagonals or lower-right odd diagonals
-            if (plaq_x < plaq_y and (plaq_x - plaq_y) % 2 == 0) or (plaq_x > plaq_y and (plaq_x - plaq_y) % 2 == 1):
-                # join with X to lower-left boundary
-                site_x, site_y = plaq_x, plaq_y
-                while site_x >= 0 and site_y >= 0:
-                    sample_recovery.site('X', (site_x, site_y))
-                    site_x -= 1
-                    site_y -= 1
-            else:
-                # join with X to upper-right boundary
-                site_x, site_y = plaq_x + 1, plaq_y + 1
-                while site_x <= max_site_x and site_y <= max_site_y:
-                    sample_recovery.site('X', (site_x, site_y))
-                    site_x += 1
-                    site_y += 1
-            """
-
-        # return sample
-        return sample_recovery
-
     @property
     def label(self):
         """See :meth:`qecsim.model.Decoder.label`"""
