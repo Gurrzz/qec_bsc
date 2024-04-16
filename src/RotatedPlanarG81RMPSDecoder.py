@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 @cli_description('Rotated MPS ([chi] INT >=0, [mode] CHAR, ...)')
 class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
     r"""
-    Implements a rotated planar XZ Rotated Matrix Product State (RMPS) decoder.
+    Implements a rotated planar G18 (XZXZ/ZXZX) Rotated Matrix Product State (RMPS) decoder.
 
     Decoding algorithm:
 
-    * A sample recovery operation :math:`f` is found by applying a path of X operators between each plaquette,
+    * A sample recovery operation :math:`f` is found by applying a path of X or Z operators between each plaquette,
       identified by the syndrome, along a diagonal to an appropriate boundary.
     * The probability of the left coset :math:`fG` of the stabilizer group :math:`G` of the planar code with respect
       to :math:`f` is found by contracting an appropriately defined MPS-based tensor network (see
@@ -63,7 +63,7 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
 
 
     MPS tensor network as per https://arxiv.org/abs/1405.4883 (s=stabilizer), except H and V qubit tensors are defined
-    identically with the NE and SW (NW and SE) stabilizers applying Z (X) operators:
+    identically with the NE and SW (NW and SE) stabilizers applying Z (X) operators: (BEHÖVER ÄNDRAS)
     ::
 
              s
@@ -118,23 +118,74 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
     @classmethod
     def sample_recovery(cls, code, syndrome):
         """
-        Return a sample Pauli consistent with the syndrome, created by applying a path of X operators between each
+        Return a sample Pauli consistent with the syndrome, created by applying a path of X or Z operators between each
         plaquette, identified by the syndrome, along a diagonal to an appropriate boundary.
 
-        :param code: Rotated planar XZ code.
-        :type code: RotatedPlanarXZCode
+        :param code: Rotated planar G18 (XZXZ/ZXZX) code.
+        :type code: RotatedPlanarG18Code
         :param syndrome: Syndrome as binary vector.
         :type syndrome: numpy.array (1d)
         :return: Sample recovery operation as rotated planar pauli.
-        :rtype: RotatedPlanarXZPauli
+        :rtype: RotatedPlanarG18Pauli
         """
-        # prepare sample
+        # prepare a new blank sample
         sample_recovery = code.new_pauli()
-        # ask code for syndrome plaquette_indices
+        # ask code for plaquette_indices associated with the non-commuting stabilizers identified by the syndrome
         plaquette_indices = code.syndrome_to_plaquette_indices(syndrome)
-        # for each plaquette
+
         max_site_x, max_site_y = code.site_bounds
         for plaq_index in plaquette_indices:
+            # NOTE: plaquette index coincides with the index of the site in its lower left corner
+            plaq_x, plaq_y = plaq_index
+
+            # If the diagonal is even counting out from the center diagonal from bottom left to top right
+            if ((plaq_x - plaq_y) % 2 == 0):
+                
+                # Even row => ZX/ZX plaquette
+                if (plaq_y % 2 == 0): 
+
+                    # Add an (X)ZXZ... path from the site at the bottom left corner of the plaquette and left to the boundary
+                    for x in reversed(range(0, plaq_x + 1)):
+                        if (x % 2 == 0):
+                            sample_recovery.site('X', (x, plaq_y))
+                        else:
+                            sample_recovery.site('Z', (x, plaq_y))
+
+                # Odd row => XZ/XZ plaquette
+                else:
+
+                    # Add a ZXZX... path from the site at the top left corner of the plaquette and left to the boundary
+                    for x in reversed(range(0, plaq_x + 1)):
+                        if (x % 2 == 0):
+                            sample_recovery.site('X', (x, plaq_y + 1))
+                        else:
+                            sample_recovery.site('Z', (x, plaq_y + 1))
+
+            # If the diagonal is odd counting out from the center diagonal from bottom left to top right
+            else:
+
+                # Add a ZZZ... path from the lower left, down to the boundary
+                if (plaq_x % 2 == 0):
+                    for y in range(0, plaq_y + 1):
+                        sample_recovery.site('Z', (plaq_x, y))
+
+                # Add a ZZZ... path from the lower right, down to the boundary
+                else:
+                    for y in range(0, plaq_y + 1):
+                        sample_recovery.site('Z', (plaq_x + 1, y))
+
+        # return sample
+        return sample_recovery
+
+
+
+
+
+
+
+
+
+            """ ***TO BE REMOVED***
             # NOTE: plaquette index coincides with site on lower left corner
             plaq_x, plaq_y = plaq_index
             # if upper-left even diagonals or lower-right odd diagonals
@@ -152,6 +203,8 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
                     sample_recovery.site('X', (site_x, site_y))
                     site_x += 1
                     site_y += 1
+            """
+
         # return sample
         return sample_recovery
 
