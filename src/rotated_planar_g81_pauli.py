@@ -1,7 +1,7 @@
 from qecsim.models.rotatedplanar import RotatedPlanarPauli
 
 class RotatedPlanarG81Pauli(RotatedPlanarPauli): 
-     """
+    """
     Defines a Pauli operator on a rotated planar Clifford deformed G81 lattice. 
 
     Notes:
@@ -17,7 +17,7 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
     * Convert to binary symplectic form: :meth:`to_bsf`.
     * Copy a rotated planar Pauli G81 operator: :meth:`copy`.
     """
-    def plaquette(self, index):
+    def plaquette(self, index): 
         """
         Apply a plaquette operator at the given index.
 
@@ -64,14 +64,19 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
 
         Notes: 
 
-        * Operators are applied to the bottom row to allow optimisation of the MPS decoder. (KRAV ELLER VALBART?)
-
+        * Operators are applied to the bottom row to allow optimisation of the MPS decoder. 
+        
         :return: self (to allow chaining)
         :rtype: RotatedPlanarG81Pauli
         """
 
+        max_site_x, max_site_y = self.code.site_bounds
+        for x in range(0, max_site_x + 1):
+            if x % 2 == 0:
+                self.site('X', (x, 0))
+            else:
+                self.site('Z', (x, 0))
 
-        # TODO
         return self
 
 
@@ -86,9 +91,10 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
         :return: self (to allow chaining)
         :rtype: RotatedPlanarG81Pauli
         """
+        
+        max_site_x, max_site_y, = self.code.site_bounds
+        self.site('Z', *((max_site_x, y) for y in range(0, max_site_y + 1)))
 
-
-        # TODO
         return self
 
 
