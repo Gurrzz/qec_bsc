@@ -119,7 +119,7 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
     def sample_recovery(cls, code, syndrome):
         """
         Return a sample Pauli consistent with the syndrome, created by applying a path of X or Z operators between each
-        plaquette, identified by the syndrome, along a diagonal to an appropriate boundary.
+        plaquette, identified by the syndrome.
 
         :param code: Rotated planar G18 (XZXZ/ZXZX) code.
         :type code: RotatedPlanarG18Code
@@ -182,7 +182,7 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
     def label(self):
         """See :meth:`qecsim.model.Decoder.label`"""
         params = [('chi', self._chi), ('mode', self._mode), ('tol', self._tol), ]
-        return 'Rotated planar XZ RMPS ({})'.format(', '.join('{}={}'.format(k, v) for k, v in params if v))
+        return 'Rotated planar G18 (XZXZ/ZXZX) RMPS ({})'.format(', '.join('{}={}'.format(k, v) for k, v in params if v))
 
     class TNC(RotatedPlanarRMPSDecoder.TNC):
         """Tensor network creator"""
