@@ -184,12 +184,162 @@ class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
         params = [('chi', self._chi), ('mode', self._mode), ('tol', self._tol), ]
         return 'Rotated planar G18 (XZXZ/ZXZX) RMPS ({})'.format(', '.join('{}={}'.format(k, v) for k, v in params if v))
 
+
+
     class TNC(RotatedPlanarRMPSDecoder.TNC):
         """Tensor network creator"""
 
+
         @functools.lru_cache()
-        def v_node_value(self, prob_dist, f, n, e, s, w):
-            """Return V-node qubit tensor element value."""
-            # N.B. with XZ/ZX plaquettes, H-node and V-node values are both as per H-node values of the CSS code
-            return self.h_node_value(prob_dist, f, n, e, s, w)
+        def h_node_value(self, prob_dist, f, n, e, s, w, even_column):
+            """Return horizontal edge tensor element value."""
+            paulis = ('I', 'X', 'Y', 'Z')
+            op_to_pr = dict(zip(paulis, prob_dist))
+            f = pt.pauli_to_bsf(f)
+            I, X, Y, Z = pt.pauli_to_bsf(paulis)
+
+            # n, e, s, w are in {0, 1} so multiply op to turn on or off
+            if (even_column):
+                op = (f + (n * Z) + (e * X) + (s * Z) + (w * X)) % 2
+            else:
+                op = (f + (n * X) + (e * Z) + (s * X) + (w * Z)) % 2
+
+            return op_to_pr[pt.bsf_to_pauli(op)]
+
+
+        @functools.lru_cache()
+        def v_node_value(self, prob_dist, f, n, e, s, w, even_column):
+            """Return vertical edge tensor element value."""
+            # N.B. for v_node order of nesw is rotated relative to h_node
+            return self.h_node_value(prob_dist, f, e, s, w, n, even_column)
+
+
+        @functools.lru_cache(maxsize=256)
+        def create_q_node(self, prob_dist, f, h_node, even_column, compass_direction=None):
+            """Create q-node for tensor network.
+
+            Notes:
+
+            * H-nodes have Z-plaquettes above and below (i.e. in NE and SW directions).
+            * V-nodes have Z-plaquettes on either side (i.e. in NW and SE directions).
+            * Columns are considered even/odd according to indexing defined in :class:`RotatedPlanarCode`.
+
+            :param h_node: If H-node, else V-node.
+            :type h_node: bool
+            :param prob_dist: Probability distribution in the format (Pr(I), Pr(X), Pr(Y), Pr(Z)).
+            :type prob_dist: (float, float, float, float)
+            :param f: Pauli operator on qubit as 'I', 'X', 'Y', or 'Z'.
+            :type f: str
+            :param even_column: If even column, else odd column.
+            :type even_column: bool
+            :param compass_direction: Compass direction as 'n', 'ne', 'e', ..., 'nw', or falsy for bulk.
+            :type compass_direction: str
+            :return: Q-node for tensor network.
+            :rtype: numpy.array (4d)
+            """
+
+            # H indicates h-node with shape (n,e,s,w).
+            # * indicates delta nodes with shapes (n,I,j), (e,J,k), (s,K,l), (w,L,i) for n-, e-, s-, and w-deltas
+            #   respectively.
+            # n,e,s,w,i,j,k,I,J,K are bond labels
+            #
+            #   i     I
+            #   |     |
+            # L-*     *-j
+            #    \   /
+            #    w\ /n
+            #      H
+            #    s/ \e
+            #    /   \
+            # l-*     *-J
+            #   |     |
+            #   K     k
+            #
+            # Deltas are absorbed into h-node over n,e,s,w legs and reshaped as follows:
+            # nesw -> (iI)(jJ)(Kk)(Ll)
+
+            # define shapes # q_node:(n, e, s, w); delta_nodes: n:(n,I,j), e:(e,J,k), s:(s,K,l), w:(w,L,i)
+            if h_node:
+                # bulk h-node
+                q_shape = (2, 2, 2, 2)
+                if even_column:
+                    n_shape, e_shape, s_shape, w_shape = (2, 2, 2), (2, 1, 2), (2, 2, 2), (2, 1, 2)
+                else:
+                    n_shape, e_shape, s_shape, w_shape = (2, 2, 1), (2, 2, 2), (2, 2, 1), (2, 2, 2)
+                # modifications for directions
+                if compass_direction == 'n':
+                    q_shape = (2, 2, 2, 1)
+                    n_shape, w_shape = (2, 1, 2), (1, 1, 1)
+                elif compass_direction == 'ne':
+                    q_shape = (1, 2, 2, 1)
+                    n_shape, e_shape, w_shape = (1, 1, 1), (2, 1, 2), (1, 1, 1)
+                elif compass_direction == 'e':
+                    q_shape = (1, 2, 2, 2)
+                    n_shape, e_shape = (1, 1, 1), (2, 1, 2)
+                elif compass_direction == 'se':  # always even
+                    q_shape = (1, 1, 2, 2)
+                    n_shape, e_shape, s_shape = (1, 1, 1), (1, 1, 1), (2, 1, 2)
+                elif compass_direction == 's':  # always even
+                    q_shape = (2, 1, 2, 2)
+                    e_shape, s_shape = (1, 1, 1), (2, 1, 2)
+                elif compass_direction == 'sw':  # always even
+                    q_shape = (2, 1, 1, 2)
+                    e_shape, s_shape, w_shape = (1, 1, 1), (1, 1, 1), (2, 1, 2)
+                elif compass_direction == 'w':  # always even
+                    q_shape = (2, 2, 1, 2)
+                    s_shape, w_shape = (1, 1, 1), (2, 1, 2)
+                elif compass_direction == 'nw':  # always even
+                    q_shape = (2, 2, 1, 1)
+                    n_shape, s_shape, w_shape = (2, 1, 2), (1, 1, 1), (1, 1, 1)
+            else:
+                # bulk v-node
+                q_shape = (2, 2, 2, 2)
+                if even_column:
+                    n_shape, e_shape, s_shape, w_shape = (2, 2, 2), (2, 1, 2), (2, 2, 2), (2, 1, 2)
+                else:
+                    n_shape, e_shape, s_shape, w_shape = (2, 2, 1), (2, 2, 2), (2, 2, 1), (2, 2, 2)
+                # modifications for directions
+                if compass_direction == 'n':
+                    q_shape = (1, 2, 2, 2)
+                    n_shape, w_shape = (1, 1, 1), (2, 2, 1)
+                elif compass_direction == 'ne':
+                    q_shape = (1, 1, 2, 2)
+                    n_shape, e_shape, w_shape = (1, 1, 1), (1, 1, 1), (2, 2, 1)
+                elif compass_direction == 'e':
+                    q_shape = (2, 1, 2, 2)
+                    n_shape, e_shape = (2, 2, 1), (1, 1, 1)
+                elif compass_direction == 'se':  # always odd
+                    q_shape = (2, 1, 1, 2)
+                    n_shape, e_shape, s_shape = (2, 2, 1), (1, 1, 1), (1, 1, 1)
+                elif compass_direction == 's':  # always odd
+                    q_shape = (2, 2, 1, 2)
+                    e_shape, s_shape = (2, 2, 1), (1, 1, 1)
+                elif compass_direction == 'sw':  # not possible
+                    raise ValueError('Cannot have v-node in SW corner of lattice.')
+                elif compass_direction == 'w':  # always even
+                    q_shape = (2, 2, 2, 1)
+                    s_shape, w_shape = (2, 2, 1), (1, 1, 1)
+                elif compass_direction == 'nw':  # always even
+                    q_shape = (1, 2, 2, 1)
+                    n_shape, s_shape, w_shape = (1, 1, 1), (2, 2, 1), (1, 1, 1)
+
+            # create deltas
+            n_delta = tt.tsr.delta(n_shape)
+            e_delta = tt.tsr.delta(e_shape)
+            s_delta = tt.tsr.delta(s_shape)
+            w_delta = tt.tsr.delta(w_shape)
+            # create q_node and fill values
+            q_node = np.empty(q_shape, dtype=np.float64)
+            for n, e, s, w in np.ndindex(q_node.shape):
+                if h_node:
+                    q_node[(n, e, s, w)] = self.h_node_value(prob_dist, f, n, e, s, w, even_column)
+                else:
+                    q_node[(n, e, s, w)] = self.v_node_value(prob_dist, f, n, e, s, w, even_column)
+            # derive combined node shape
+            shape = (w_shape[2] * n_shape[1], n_shape[2] * e_shape[1], e_shape[2] * s_shape[1], s_shape[2] * w_shape[1])
+            # create combined node by absorbing deltas into q_node: nesw -> (iI)(jJ)(Kk)(Ll)
+            node = np.einsum('nesw,nIj,eJk,sKl,wLi->iIjJKkLl', q_node, n_delta, e_delta, s_delta, w_delta).reshape(
+                shape)
+            # return combined node
+            return node
 
