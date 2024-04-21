@@ -2,11 +2,11 @@ import operator
 
 from qecsim.model import cli_description
 from qecsim.models.rotatedplanar import RotatedPlanarCode
-import RotatedPlanarG81Pauli
+import RotatedPlanarG81Pauli as G81Pauli
 
 
 @cli_description('Rotated planar G81 (distance INT odd >= 3)')
-class RotatedPlanarXZCode(RotatedPlanarCode):
+class RotatedPlanarG81Code(RotatedPlanarCode):
     r"""
     Implements a rotated planar mixed boundary code with XZXZ/ZXZX plaquettes defined by its lattice size.
 
@@ -136,5 +136,5 @@ class RotatedPlanarXZCode(RotatedPlanarCode):
         :return: Rotated planar G81 (XZXZ/ZXZX) Pauli
         :rtype: RotatedPlanarG81Pauli
         """
-        return RotatedPlanarG81Pauli(self, bsf)
+        return G81Pauli.RotatedPlanarG81Pauli(self, bsf)
 
