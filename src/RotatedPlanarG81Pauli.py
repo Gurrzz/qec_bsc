@@ -24,9 +24,9 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
         Notes:
 
         * Index is in the format (x, y).
-        * If an ZX/ZX-type plaquette is indexed (i.e. (x - y) % 2 == 0), then Z operators are applied in the NW and SW 
+        * If an ZX/ZX-type plaquette is indexed (i.e. y % 2 == 0), then Z operators are applied in the NW and SW 
           corners of the plaquette, and X operators are applied in the NE and SE corners of the plaquette.
-        * If an XZ/XZ-type plaquette is indexed (i.e. (x - y) % 2 == 1), then X operators are applied in the NW and SW 
+        * If an XZ/XZ-type plaquette is indexed (i.e. y % 2 == 1), then X operators are applied in the NW and SW 
           corners of the plaquette, and Z operators are applied in the NE and SE corners of the plaquette.
         * Applying plaquette operators on plaquettes that lie outside the lattice have no effect on the lattice.
 
@@ -40,7 +40,7 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
         if self.code.is_in_plaquette_bounds(index):
 
             # if ZX/ZX
-            if (abs(x - y) % 2 == 0): 
+            if (y % 2 == 0): 
                 # flip plaquette sites
                 self.site('Z', (x, y)) # SW
                 self.site('Z', (x, y + 1)) # NW
