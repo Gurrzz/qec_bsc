@@ -1,14 +1,22 @@
 import functools
+import itertools
+import json
 import logging
+import operator
 
-from qecsim.model import cli_description
+import numpy as np
+from mpmath import mp
+
+from qecsim import paulitools as pt, tensortools as tt
+from qecsim.model import Decoder, cli_description
+from qecsim.models.generic import DepolarizingErrorModel
 from qecsim.models.rotatedplanar import RotatedPlanarRMPSDecoder
 
 logger = logging.getLogger(__name__)
 
 
 @cli_description('Rotated MPS ([chi] INT >=0, [mode] CHAR, ...)')
-class RotatedPlanarG18RMPSDecoder(RotatedPlanarRMPSDecoder):
+class RotatedPlanarG81RMPSDecoder(RotatedPlanarRMPSDecoder):
     r"""
     Implements a rotated planar G18 (XZXZ/ZXZX) Rotated Matrix Product State (RMPS) decoder.
 
