@@ -44,9 +44,12 @@ print('Error probabilities:', error_probabilities)
 print('Maximum runs:', max_runs)
 
 
-# Run simulations and save the result as a list of dictionaries
+# Run simulations and store the result as a list of dictionaries
 data = [app.run(code, error_model, decoder, error_probability, max_runs=max_runs) 
         for code in codes for error_probability in error_probabilities]
+
+
+### Save data to file in json format, named with the current datetime
 
 time_now = str(datetime.now())
 
