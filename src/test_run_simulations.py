@@ -36,7 +36,7 @@ error_probability_min, error_probability_max = (0, 0.5)
 error_probabilities = np.linspace(error_probability_min, error_probability_max, 10)
 
 # Set max runs for each probability
-max_runs = 1000
+max_runs = 100
 
 # Print run parameters
 print('Codes:', [code.label for code in codes])
