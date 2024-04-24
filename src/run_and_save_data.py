@@ -53,7 +53,8 @@ data = [app.run(code, error_model, decoder, error_probability, max_runs=max_runs
 
 time_now = str(datetime.now())
 
-with open(f"simulation_{time_now}_data.json", "w", encoding="utf-8") as file:
+#with open(f"simulation_{time_now}_data.json", "w", encoding="utf-8") as file:
+with open(f"simulation_test_data.json", "w", encoding="utf-8") as file:
     for entry in data:
         file.write(json.dumps(entry))
         file.write("\n")
