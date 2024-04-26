@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 ### Load data
 
-file_name_1 = "eta_run_1.json"
+file_name_1 = "eta_run_2.json"
 data = []
 
 with open(file_name_1, "r", encoding="utf-8") as file:
@@ -47,7 +47,7 @@ for code, xys in xy_map.items():
     plt.plot(*zip(*xys), 'x-', label=legend_label)
 # plt.legend(loc='upper right', fontsize=11)
 plt.grid()
-plt.savefig("var_eta_d_3_p_specialpoint_svenska.png")
+plt.savefig("var_eta_d_3_p_specialpoint_svenska_2.png")
 
 
 
