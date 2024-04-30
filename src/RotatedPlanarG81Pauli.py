@@ -7,7 +7,7 @@ class RotatedPlanarG81Pauli(RotatedPlanarPauli):
     Notes:
 
     * This is a utility class used by rotated planar implementations of the core models.
-    * It is typically instantiated using :meth:`qecsim.models.rotatedplanar.RotatedPlanarCode.new_pauli`//BEHÖVER ÄNDRAS
+    * It is typically instantiated using :meth:`qecsim.models.rotatedplanar.RotatedPlanarG81Code.new_pauli 
 
     Use cases:
 
