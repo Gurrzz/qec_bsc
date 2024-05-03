@@ -2,7 +2,7 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-
+import locale
 
 
 ### Load data
@@ -44,17 +44,20 @@ for run in data:
 d_min = 3  # Kan också hämtas ur data för plottning, se label "error_probability"
 d_max = 19
 
+locale.setlocale(locale.LC_NUMERIC, "sv_SE.utf8")
+plt.rcParams['axes.formatter.use_locale'] = True
+
 
 fig = plt.figure(1, figsize=(8, 6))
-plt.title('Simulering med ytkod G81 vid särskilda punkten för p', fontsize=14)
-plt.xlabel('Kodavstånd d', fontsize=12)
+plt.title('Simulering med ytkod G81 vid särskilda punkten för $p$', fontsize=14)
+plt.xlabel('Kodavstånd $d$', fontsize=12)
 plt.ylabel('Logisk felsannolikhet', fontsize=12)
 plt.xlim(d_min-1, d_max+1)
 plt.ylim(0.45, 0.6)
 
 # add data
 for error_model, xys in xy_map.items():
-    legend_label = f"{error_model[21:-11]}"
+    legend_label = f"$\eta${error_model[25:-11]}"
     plt.plot(*zip(*xys), 'x-', label=legend_label)
 plt.legend(loc='upper left', fontsize=11)
 plt.xticks(np.arange(3,21,2))

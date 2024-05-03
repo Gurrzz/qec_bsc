@@ -1,7 +1,7 @@
 ### Initial imports
 import json
 import matplotlib.pyplot as plt
-
+import locale
 
 
 ### Load data
@@ -42,17 +42,19 @@ for run in data:
 error_probability_min = 0  # Kan också hämtas ur data för plottning, se label "error_probability"
 error_probability_max = 0.5
 
+locale.setlocale(locale.LC_NUMERIC, "sv_SE.utf8")
+plt.rcParams['axes.formatter.use_locale'] = True
 
 fig = plt.figure(1, figsize=(8, 6))
-plt.title('Simulering med ytkod G81, Z-bias = 30', fontsize=14)
-plt.xlabel('Fysisk felsannolikhet, p', fontsize=12)
+plt.title('Simulering med ytkod G81, Z-bias $\eta = 30$', fontsize=14)
+plt.xlabel('Fysisk felsannolikhet, $p$', fontsize=12)
 plt.ylabel('Logisk felsannolikhet', fontsize=12)
 plt.xlim(error_probability_min-0.05, error_probability_max+0.05)
 plt.ylim(-0.05, 0.65)
 
 # add data
 for code, xys in xy_map.items():
-    legend_label = f"{code[31:]}"
+    legend_label = f"${code[31:]}$"
     plt.plot(*zip(*xys), 'x-', label=legend_label)
 plt.legend(loc='upper left', fontsize=11)
 plt.grid()

@@ -2,6 +2,7 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import locale
 
 ### Analytical solution
 
@@ -59,9 +60,11 @@ for run in data:
 eta_min = 1  # Kan också hämtas ur data för plottning, se label "error_probability"
 eta_max = 1000 
 
+locale.setlocale(locale.LC_NUMERIC, "sv_SE.utf8")
+plt.rcParams['axes.formatter.use_locale'] = True
 
 fig = plt.figure(1, figsize=(8, 6))
-plt.title('Simulering och analytisk lösning med ytkod G81, d = 3, i särskilda punkten', fontsize=14)
+plt.title('Simulering och analytisk lösning med ytkod G81, $d = 3$, i särskilda punkten', fontsize=14)
 plt.xlabel('Z-bias [$\eta$]', fontsize=12)
 plt.ylabel('Logisk felsannolikhet', fontsize=12)
 plt.xlim(eta_min-5, 500+5)
@@ -69,7 +72,7 @@ plt.ylim(0.45, 0.75)
 
 # add data
 for code, xys in xy_map.items():
-    legend_label = f"{code[15:18]}, {code[31:]}, simulerad"
+    legend_label = f"{code[15:18]} simulerad"
     
     plt.plot(*zip(*xys), label=legend_label)
 
