@@ -29,9 +29,12 @@ of which can be seen below:
 This code is created by starting out with the XZ code and applying 
 Hadamard operators (H) in vertical lines in every second column. 
 
+With written permission from Yinzi Xiao, his project yzzy-xyz-code
+and his master's thesis has also served as inspiration for this adaptation. 
+
 
 #Links 
 
 [qecsim](https://github.com/qecsim)
 [qsdxzzx](https://bitbucket.org/qecsim/qsdxzzx/src/master/)
-
+[yzzy-xyz-code](https://github.com/yinzi-xiao/yzzy-xyz-code)
